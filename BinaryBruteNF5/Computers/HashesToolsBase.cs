@@ -20,6 +20,7 @@ namespace BinaryBrute
 
         protected static byte[][] hashesToFind;
         protected static byte[][] inputs4Core;
+        protected static byte[][] wordList;
 
         protected static bool Working;
         protected static int coresCount;
@@ -124,18 +125,18 @@ namespace BinaryBrute
             {
                 try
                 {
-                    if (File.Exists("founded.txt"))
+                    if (File.Exists("found.txt"))
                     {
-                        txt = File.ReadAllText("founded.txt") + "\n";
+                        txt = File.ReadAllText("found.txt") + "\n";
                         txt += hashStr + ": " + valueStr + "  - \"" + valuePlainText + "\".";
 
-                        File.WriteAllText("founded.txt", txt);
+                        File.WriteAllText("found.txt", txt);
                     }
                     else
                     {
                         txt = hashStr + ": " + valueStr + "  - \"" + valuePlainText + "\".";
 
-                        File.WriteAllText("founded.txt", txt);
+                        File.WriteAllText("found.txt", txt);
                     }
                 }
 

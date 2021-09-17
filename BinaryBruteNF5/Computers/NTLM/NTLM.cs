@@ -7,7 +7,7 @@ namespace BinaryBrute
     {
 
         /// <summary>
-        /// Principal process that initialize all threads for calculate MD5 hashes
+        /// Principal process that initialize all threads for calculate NTLM hashes
         /// </summary>
         /// <param name="hashes"></param>
         [STAThread]
@@ -79,6 +79,53 @@ namespace BinaryBrute
                 ExistHash(hashesToFind, hash, inputs);
 
                 countHashes++;
+            }
+        }
+
+        /// <summary>
+        /// synchronous process to calculate hashes from a wordlist
+        /// </summary>
+        /// <param name="hashes">hashes to find</param>
+        /// <param name="WordList"></param>
+        public static void RunWithWordList(byte[][] hashes, byte[][] WordList)
+        {
+            hashesToFind = hashes;
+            wordList = WordList;
+            Thread[] threads = new Thread[coresCount];
+
+
+            coresCount = 1;
+            RunCoreWordList(0);
+
+            Console.WriteLine("- Finished.");
+            Console.WriteLine("- Count hashes calculated: " + countHashes + "/" + wordList.Length);
+
+            Console.ReadKey();
+
+        }
+
+
+        private static void RunCoreWordList(object obj)
+        {
+            Console.WriteLine($"core {(int)obj} initializing");
+
+            int i = (int)obj;   //  Index
+            int length = wordList.Length;
+            byte[] hash = new byte[0];
+
+            NTLMProcessor ntlm = new NTLMProcessor();
+
+
+            for (; i < length; i+= coresCount)
+            {
+                try
+                {
+                    hash = ntlm.ComputeHash(wordList[i]);
+                    countHashes++;
+                }
+                catch(Exception e) { Console.WriteLine($"Error index({i}): {e.Message}"); }
+
+                ExistHash(hashesToFind, hash, wordList[i]);
             }
         }
     }

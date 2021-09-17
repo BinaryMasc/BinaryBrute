@@ -34,6 +34,7 @@ namespace BinaryBrute
         OnlyNumbers,
         OnlyLetters,
         AlphaNumeric,
-        LowercaseUppercase
+        LowercaseUppercase,
+        WordList
     }
 }

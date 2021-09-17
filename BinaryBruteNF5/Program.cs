@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -71,30 +72,54 @@ namespace BinaryBrute
             //  Select the hashes to find previously loaded
             byte[][] hashesArray = (from str in hashList select StringToByteArray(str)).ToArray();
 
+            //  WordList
+            List<byte[]> wordList = new List<byte[]>();
+
             
 
 
             if (stateLoaded)
             {
-                Console.WriteLine("- Data loaded");
-                BruteToolsBase.SetActualInputsArray(inputs);
-                BruteToolsBase.SetCountHashes(countHahes);
+                if(mode != Mode.WordList)
+                {
+                    Console.WriteLine("- Data loaded");
+                    BruteToolsBase.SetActualInputsArray(inputs);
+                    BruteToolsBase.SetCountHashes(countHahes);
 
-                Console.WriteLine("Iniciando con Byte arrays: \n");
-                Console.ForegroundColor = ConsoleColor.DarkYellow;
-                foreach (var hash in BruteToolsBase.GetInputsArray()) Console.WriteLine(ByteArrayToHexString(hash));
-                Console.ResetColor();
+                    Console.WriteLine("Initializing with Byte arrays: \n");
+                    Console.ForegroundColor = ConsoleColor.DarkYellow;
+                    foreach (var hash in BruteToolsBase.GetInputsArray()) Console.WriteLine(ByteArrayToHexString(hash));
+                    Console.ResetColor();
+                }
             }
 
 
             Console.WriteLine("- Working");
 
+            //  Load the wordlist
+            if(mode == Mode.WordList)
+            {
+                Console.WriteLine($"- Reading wordlist.");
+                var lines = File.ReadAllLines("wordlist.txt");
+
+                Console.WriteLine("- Deserializing.");
+                foreach (var line in lines) wordList.Add(Encoding.UTF8.GetBytes(line));
+            }
+
             //  Run
             if (algorithm == Algorithm.MD5)
-                MD5.Run(hashesArray, mode);
+            {
+                if(mode != Mode.WordList) MD5.Run(hashesArray, mode);
+
+                //else MD5.RunWithWordList(hashesArray, wordList.ToArray());    //  Pending
+            }
 
             else if (algorithm == Algorithm.NTLM)
-                NTLM.Run(hashesArray, mode);
+            {
+                if (mode != Mode.WordList) NTLM.Run(hashesArray, mode);
+                else NTLM.RunWithWordList(hashesArray, wordList.ToArray());
+            }
+                
                 
                 
 
@@ -138,7 +163,7 @@ namespace BinaryBrute
 
         private static Mode ChooseMode()
         {
-            char[] options = { '1', '2' , '3', '4' , '5' };
+            char[] options = { '1', '2' , '3', '4' , '5', '6' };
 
             char opc;
             do
@@ -151,6 +176,7 @@ namespace BinaryBrute
                 Console.WriteLine("3) OnlyLetters");
                 Console.WriteLine("4) All Chars (32 - 126)");
                 Console.WriteLine("5) Full Byte (0 - 255)");
+                Console.WriteLine("6) Wordlist");
 
                 Console.WriteLine("\nOption: ");
 
@@ -165,6 +191,7 @@ namespace BinaryBrute
 
                 case '4': return Mode.AllChars;
                 case '5': return Mode.FullByte;
+                case '6': return Mode.WordList;
 
 
                 default: return Mode.FullByte;
@@ -181,6 +208,7 @@ namespace BinaryBrute
 
                 case "AllChars": return Mode.AllChars;
                 case "FullByte": return Mode.FullByte;
+                case "WordList": return Mode.WordList;
 
 
                 default: return Mode.FullByte;
