@@ -99,6 +99,13 @@ namespace BinaryBrute
             //  Load the wordlist
             if(mode == Mode.WordList)
             {
+                if (!File.Exists("wordlist.txt"))
+                {
+                    Console.WriteLine("(!) 'wordlist.txt' not exist");
+                    Console.ReadKey();
+                    return;
+                }
+
                 Console.WriteLine($"- Reading wordlist.");
                 var lines = File.ReadAllLines("wordlist.txt");
 
@@ -111,7 +118,11 @@ namespace BinaryBrute
             {
                 if(mode != Mode.WordList) MD5.Run(hashesArray, mode);
 
-                //else MD5.RunWithWordList(hashesArray, wordList.ToArray());    //  Pending
+                else
+                {
+                    //MD5.RunWithWordList(hashesArray, wordList.ToArray());    //  Pending
+                    throw new NotImplementedException();
+                }
             }
 
             else if (algorithm == Algorithm.NTLM)
